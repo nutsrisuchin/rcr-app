@@ -1,0 +1,64 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:latest'
+      - '.'
+    id: 'build-image'
+
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:${SHORT_SHA}'
+    waitFor: ['build-image']
+    id: 'push-image'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'google/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:${SHORT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--cpu=${_CPU}'
+      - '--memory=${_MEMORY}'
+      - '--concurrency=${_CONCURRENCY}'
+      - '--timeout=${_TIMEOUT}'
+      - '--min-instances=${_MIN_INSTANCES}'
+      - '--max-instances=${_MAX_INSTANCES}'
+      - '--service-account=${_SERVICE_ACCOUNT_EMAIL}'
+      - '--session-affinity'
+      - '--allow-unauthenticated'
+      - '--execution-environment=gen2'
+      - '--set-env-vars=NODE_ENV=production'
+    waitFor: ['push-image']
+    id: 'deploy-cloudrun'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/rcr-app:latest'
+
+substitutions:
+  _REGION: 'asia-southeast1'
+  _ARTIFACT_REGISTRY_REPO: 'rcr-app-repo'
+  _SERVICE_NAME: 'rcr-app'
+  _SERVICE_ACCOUNT_EMAIL: 'rcr-app-service@${PROJECT_ID}.iam.gserviceaccount.com'
+  _CPU: '1'
+  _MEMORY: '512Mi'
+  _PORT: '8080'
+  _CONCURRENCY: '80'
+  _TIMEOUT: '300'
+  _MIN_INSTANCES: '0'
+  _MAX_INSTANCES: '10'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'
