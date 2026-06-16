@@ -53,7 +53,6 @@ substitutions:
   _SERVICE_ACCOUNT_EMAIL: 'rcr-app-service@${PROJECT_ID}.iam.gserviceaccount.com'
   _CPU: '1'
   _MEMORY: '512Mi'
-  _PORT: '8080'
   _CONCURRENCY: '80'
   _TIMEOUT: '300'
   _MIN_INSTANCES: '0'
