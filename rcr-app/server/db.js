@@ -7,9 +7,10 @@ let dbWrapper = {};
 if (usePostgres) {
   const { Pool } = require('pg');
   console.log('Connecting to PostgreSQL database...');
+  const isUnixSocket = process.env.DATABASE_URL.includes('/cloudsql/');
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: isUnixSocket ? false : (process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false)
   });
 
   const initQuery = `
