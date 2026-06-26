@@ -1,23 +1,36 @@
 steps:
-  # Docker Build
+  # Step 1: Build the Docker image (context is ./rcr-app where the Dockerfile lives)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 
-          '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}', '.']
-
-  # Docker push to Google Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push',  '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}']
-      
-  # Deploy to Cloud Run
-  - name: google/cloud-sdk
     args:
-      - 'gcloud'
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:latest'
+      - './rcr-app'
+    id: 'build-image'
+
+  # Step 2: Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
+    waitFor: ['build-image']
+    id: 'push-image'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'google/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
       - 'run'
       - 'deploy'
       - '${REPO_NAME}'
       - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--platform=managed'
+      - '--ingress=internal-and-cloud-load-balancing'
+      - '--vpc-connector=${_VPC_CONNECTOR}'
+      - '--vpc-egress=all-traffic'
       - '--cpu=${_CPU}'
       - '--memory=${_MEMORY}'
       - '--concurrency=${_CONCURRENCY}'
@@ -28,18 +41,25 @@ steps:
       - '--session-affinity'
       - '--allow-unauthenticated'
       - '--execution-environment=gen2'
+      - '--set-env-vars=NODE_ENV=production'
+    waitFor: ['push-image']
+    id: 'deploy-cloudrun'
 
 images:
- - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:latest'
 
 substitutions:
   _REGION: 'asia-southeast1'
   _ARTIFACT_REGISTRY_REPO: 'cloudrun-app'
   _SERVICE_ACCOUNT_NAME: 'svca-gc-npr-hxai-run-web@prj-gc-npr-temai-rtai-01.iam.gserviceaccount.com'
+  _CPU: '1'
+  _MEMORY: '512Mi'
+  _CONCURRENCY: '80'
+  _TIMEOUT: '300'
+  _MIN_INSTANCES: '0'
+  _MAX_INSTANCES: '1'
 
-# Cloud Build Service Account
-#serviceAccount: 'projects/prj-gc-npr-temai-rtai-01/serviceAccounts/svca-gc-npr-hxai-build-iac@prj-gc-npr-temai-rtai-01.iam.gserviceaccount.com'
-
-# Logging configuration
 options:
-  logging: CLOUD_LOGGING_ONLY    # Log only to Cloud Logging
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'
