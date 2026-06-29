@@ -53,6 +53,7 @@ substitutions:
   _REGION: 'asia-southeast1'
   _ARTIFACT_REGISTRY_REPO: 'cloudrun-app'
   _SERVICE_ACCOUNT_NAME: 'svca-gc-npr-hxai-run-web@prj-gc-npr-temai-rtai-01.iam.gserviceaccount.com'
+  _VPC_CONNECTOR: 'svpc-gc-npr-temai-gcdev-1'
   _CPU: '1'
   _MEMORY: '512Mi'
   _CONCURRENCY: '80'
