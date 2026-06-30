@@ -24,7 +24,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - '${REPO_NAME}'
+      - '${_SERVICE_NAME}'
       - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--platform=managed'
@@ -39,7 +39,6 @@ steps:
       - '--max-instances=${_MAX_INSTANCES}'
       - '--service-account=${_SERVICE_ACCOUNT_NAME}'
       - '--session-affinity'
-      - '--allow-unauthenticated'
       - '--execution-environment=gen2'
       - '--set-env-vars=NODE_ENV=production'
     waitFor: ['push-image']
@@ -52,6 +51,7 @@ images:
 substitutions:
   _REGION: 'asia-southeast1'
   _ARTIFACT_REGISTRY_REPO: 'cloudrun-app'
+  _SERVICE_NAME: 'rcr-github'
   _SERVICE_ACCOUNT_NAME: 'svca-gc-npr-hxai-run-web@prj-gc-npr-temai-rtai-01.iam.gserviceaccount.com'
   _VPC_CONNECTOR: 'svpc-gc-npr-temai-gcdev-1'
   _CPU: '1'
