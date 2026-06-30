@@ -7,7 +7,7 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:${SHORT_SHA}'
       - '-t'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${REPO_NAME}:latest'
-      - './rcr-github'
+      - './rcr-app'
     id: 'build-image'
 
   # Step 2: Push to Artifact Registry
