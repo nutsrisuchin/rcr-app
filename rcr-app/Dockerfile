@@ -8,16 +8,12 @@ RUN npm run build
 
 # Stage 2: Setup the Express Backend
 FROM node:20-alpine
-WORKDIR /app
-
-# Build tools required for sqlite3 native module compilation
-RUN apk add --no-cache python3 make g++
+WORKDIR /app/server
 
 # Copy backend source first
-WORKDIR /app/server
 COPY server/ .
 
-# Remove any host-built node_modules (wrong architecture) and install fresh on Alpine
+# Remove any host-built node_modules and install fresh (Firestore SDK is pure JS — no build tools needed)
 RUN rm -rf node_modules && npm install
 
 # Copy the built frontend static files from Stage 1 into a 'dist' folder
