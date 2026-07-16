@@ -238,17 +238,28 @@ body {
     padding: 1px !important;
   }
   .checklist-table textarea {
-    min-height: 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    font-size: 7px !important;
+    line-height: 1.0 !important;
   }
   .checklist-table span[style*="font-size"] {
-    font-size: 8px !important;
+    font-size: 7px !important;
   }
   .checklist-select {
     border: none;
     appearance: none;
     background: transparent;
     font-weight: bold;
+    font-size: 7px !important;
     text-align: center;
+  }
+  .checklist-table .rcr-select-light {
+    font-size: 7px !important;
+  }
+  .checklist-checkbox {
+    width: 8px !important;
+    height: 8px !important;
   }
   .checklist-signature {
     background-color: #fef08a !important;

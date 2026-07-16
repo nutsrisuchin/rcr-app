@@ -541,13 +541,13 @@ const RcrForm = () => {
                 <table className="checklist-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '30%' }}>(Checks to be carried out)</th>
-                      <th style={{ width: '15%' }}>(Percentage or No. required)</th>
-                      <th style={{ width: '7%' }}>QC Contractor</th>
-                      <th style={{ width: '7%' }}>Inspector</th>
-                      <th style={{ width: '4%' }}>YES</th>
-                      <th style={{ width: '4%' }}>N/A</th>
-                      <th style={{ width: '33%' }}>Remark/Note</th>
+                      <th style={{ width: '28%' }}>(Checks to be carried out)</th>
+                      <th style={{ width: '11%' }}>(Percentage or No. required)</th>
+                      <th style={{ width: '5%' }}>QC Contractor</th>
+                      <th style={{ width: '5%' }}>Inspector</th>
+                      <th style={{ width: '3%' }}>YES</th>
+                      <th style={{ width: '3%' }}>N/A</th>
+                      <th style={{ width: '45%' }}>Remark/Note</th>
                     </tr>
                   </thead>
                   <tbody>
