@@ -430,6 +430,13 @@ const RcrForm = () => {
                 <span>Requirements for Construction, Repair and Plant Changes (RCR)</span>
               </div>
 
+              <div className="rcr-id-strip">
+                <span><strong>Line No. / Equipment No.:</strong> {lineNo || '—'}</span>
+                <span><strong>Plant:</strong> {selectedPlant || '—'}</span>
+                <span><strong>RCR Standard No.:</strong> {`RCR-STD-${String(mappingItem.rcrNo).padStart(2, '0')}`}</span>
+                <span><strong>Date:</strong> {date}</span>
+              </div>
+
               <div className="rcr-grid">
                 <div className="rcr-field" style={{ gridColumn: '1 / -1' }}>
                   <label>Topic of Repair</label>
