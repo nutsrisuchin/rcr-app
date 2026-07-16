@@ -313,7 +313,12 @@ const RcrForm = () => {
   };
 
   const handlePrint = () => {
+    const rcrNo = mappingItem ? String(mappingItem.rcrNo).padStart(2, '0') : '';
+    const parts = ['RCR', selectedPlant, rcrNo && `STD-${rcrNo}`, lineNo, date].filter(Boolean);
+    const originalTitle = document.title;
+    document.title = parts.join('_').replace(/[\\/:*?"<>|]/g, '-');
     window.print();
+    document.title = originalTitle;
   };
 
   const handleSave = async () => {
